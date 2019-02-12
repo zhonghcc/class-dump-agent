@@ -21,8 +21,11 @@ public class ClassDumpAgent implements ClassFileTransformer {
 
     static Set<String> classNames = new HashSet<String>(){{
         this.add("constants.ServerConstants");
-        this.add("gui.ZEVMS");
-        this.add("server.ServerProperties");
+        this.add("constants.GameConstants");
+        //this.add("gui.ZEVMS");
+//        this.add("a.本地数据库");
+        this.add("abc.Game");
+//        this.add("server.ServerProperties");
     }};
     public byte[] transform(ClassLoader loader, final String className, final Class<?> classBeingRedefined, ProtectionDomain protectionDomain, final byte[] classfileBuffer) throws IllegalClassFormatException {
 
@@ -30,6 +33,7 @@ public class ClassDumpAgent implements ClassFileTransformer {
         if(!classNames.contains(classNamePot)){
             return null;
         }
+//        startDump(className,classBeingRedefined,classfileBuffer);
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -42,7 +46,7 @@ public class ClassDumpAgent implements ClassFileTransformer {
 
     public void startDump(String className,Class<?> classBeingRedefined, byte[] classfileBuffer){
         try {
-            Thread.sleep(5000);
+            Thread.sleep(50);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -65,8 +69,14 @@ public class ClassDumpAgent implements ClassFileTransformer {
             System.out.println("field-------");
             Object instance = null;
             for(Field field : fields){
-                System.out.println(field.getName() + ":" +field.getType().getName()+ "static:" + Modifier.isStatic(field.getModifiers()));
+                System.out.println(field.getName() + ":" +field.getType().getName()+ " static:" + Modifier.isStatic(field.getModifiers()));
 
+                if(Modifier.isStatic(field.getModifiers())){
+                    field.setAccessible(true);
+                    instance = field.get(Object.class);
+                    System.out.println(field.getName() +" value="+instance);
+
+                }
                 if(field.getName().equals("instance")){
                     field.setAccessible(true);
                     instance = field.get(Object.class);
@@ -82,6 +92,20 @@ public class ClassDumpAgent implements ClassFileTransformer {
                     Object f = field.get(Object.class);
                     Properties props = (Properties)f;
                     props.list(System.out);
+                }
+                if(field.getName().equals("单机人数")){
+                    field.setAccessible(true);
+                    Object f = field.get(Object.class);
+                    field.set(Object.class,4);
+                    instance = field.get(Object.class);
+                    System.out.println(field.getName() +" value="+instance);
+                }
+                if(field.getName().equals("调试")||field.getName().equals("调试输出")){
+                    field.setAccessible(true);
+                    Object f = field.get(Object.class);
+                    field.set(Object.class,"开");
+                    instance = field.get(Object.class);
+                    System.out.println(field.getName() +" value="+instance);
                 }
             }
             System.out.println("method-------");
