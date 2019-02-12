@@ -20,12 +20,16 @@ import java.util.Set;
 public class ClassDumpAgent implements ClassFileTransformer {
 
     static Set<String> classNames = new HashSet<String>(){{
-        this.add("constants.ServerConstants");
-        this.add("constants.GameConstants");
-        //this.add("gui.ZEVMS");
+//        this.add("constants.ServerConstants");
+//        this.add("constants.GameConstants");
+//        this.add("gui.ZEVMS");
 //        this.add("a.本地数据库");
-        this.add("abc.Game");
+//        this.add("abc.Game");
 //        this.add("server.ServerProperties");
+        this.add("handling.login.LoginServer");
+        this.add("handling.login.LoginWorker");
+        this.add("handling.login.handler.CharLoginHandler");
+        this.add("handling.login.Balloon");
     }};
     public byte[] transform(ClassLoader loader, final String className, final Class<?> classBeingRedefined, ProtectionDomain protectionDomain, final byte[] classfileBuffer) throws IllegalClassFormatException {
 
@@ -46,7 +50,7 @@ public class ClassDumpAgent implements ClassFileTransformer {
 
     public void startDump(String className,Class<?> classBeingRedefined, byte[] classfileBuffer){
         try {
-            Thread.sleep(50);
+            Thread.sleep(30000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -73,16 +77,41 @@ public class ClassDumpAgent implements ClassFileTransformer {
 
                 if(Modifier.isStatic(field.getModifiers())){
                     field.setAccessible(true);
-                    instance = field.get(Object.class);
-                    System.out.println(field.getName() +" value="+instance);
+                    Object f = field.get(Object.class);
+                    System.out.println(field.getName() +" value="+f);
 
                 }
                 if(field.getName().equals("instance")){
                     field.setAccessible(true);
-                    instance = field.get(Object.class);
-                    System.out.println(instance);
+                    final Object loginInstance = field.get(Object.class);
+                    System.out.println(loginInstance);
+//                    final Field userLimitField = cc.getDeclaredField("userLimit");
+//                    userLimitField.setAccessible(true);
+//
+//                    new Thread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            try {
+//                                Thread.sleep(10000);
+//
+//                                Object f = userLimitField.get(loginInstance);
+//                                System.out.println(userLimitField.getName() + " value=" + f);
+//
+//                                userLimitField.set(loginInstance, 40);
+//                                f = userLimitField.get(loginInstance);
+//                                System.out.println(userLimitField.getName() + " value=" + f);
+//                            }catch (Exception e){
+//                                System.out.println(e.getMessage());
+//                                e.printStackTrace();
+//                            }
+//                        }
+//                    }).start();
+
+
+
                 }
-                if(field.getName().equals("显示人数")){
+
+                if(field.getName().equals("显示人数")||field.getName().equals("显示人数2")){
                     field.setAccessible(true);
                     Object f = field.get(instance);
                     System.out.println(f);
